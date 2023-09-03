@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3d Chess</title>
+    <title>Benet Coding Club</title>
 </head>
 <body>
 
@@ -135,10 +135,10 @@
         nav {
             margin: 0px auto 0;
             margin-bottom: 2vw;
-            position: relative;
+            position: fixed;
             top: 3%;
             width: 76%;
-            left: 11.2%;
+            left: 23%;
             height: 5vw;
             background-color: #570000;
             border-radius: .8vw;
@@ -331,6 +331,22 @@
             top:1px;
         }
 
+        .project-menu {
+            position: fixed;
+            top: 15%;
+            width: 76%;
+            left: 23%;
+            height: 80vh;
+
+            /* From https://css.glass */
+            /*background: rgba(147, 154, 208, 0.57);*/
+            background: rgba(255, 255, 255, 0.57);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12.1px);
+            -webkit-backdrop-filter: blur(12.1px);
+        }
+
         .main-menu {
             position: fixed;
             top: 3%;
@@ -432,6 +448,43 @@
             }
         }
 
+        
+        .buttonClass {
+            position: fixed;
+            top: 40%;
+
+            font-size:3vw;
+            font-family:Arial;
+            width:4vw;
+            height:4vw;
+            border-width:0px;
+            color:#fff;
+            border-color:rgba(208, 2, 27, 1);
+            font-style:italic;
+            border-top-left-radius:42px;
+            border-top-right-radius:42px;
+            border-bottom-left-radius:42px;
+            border-bottom-right-radius:42px;
+            box-shadow: -2px 2px 8px 1px rgba(208, 2, 27, 0.66);
+            background:rgba(230, 34, 49, 1);
+        }
+        #project-left {
+            left: 3%;
+            text-shadow: 2px 3px 6px rgba(0, 0, 0, 1);
+            text-align: left;
+            padding-left: 0.8vw;   
+        }
+        #project-right {
+            right: 3%;
+            text-shadow: -2px 3px 6px rgba(0, 0, 0, 1);
+            text-align: right;
+            padding-right: 1.1vw;   
+        }
+        .buttonClass:hover {
+            background: rgba(208, 2, 27, 0.56)
+        }
+                
+
     </style>
 
     <nav class = "nav">
@@ -479,6 +532,11 @@
             <button class="main-menu-button signup-button">signup</button>
             <button class="main-menu-button login-button">login</button>
 
+        </div>
+
+        <div class="project-menu">
+            <button href="#" class="buttonClass" id="project-left">&#60;</button>
+            <button href="#" class="buttonClass" id="project-right">&#62;</button>
         </div>
 
     </div>
