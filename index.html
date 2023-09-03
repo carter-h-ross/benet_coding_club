@@ -511,7 +511,7 @@
 
     <div class="boxes">
 
-        <div class="main-menu">
+        <div class="main-menu logged-out">
 
             <div class="wrapper" id="coding-club-h1">
                 <svg>
@@ -520,17 +520,26 @@
                     </text>
                 </svg>
             </div>
-            <label for="email">email:</label>
-            <input class="main-menu-input email-input" type="email" name="email">
-            <label for="password">password:</label>
-            <input class="main-menu-input username-input" type="text" name="username">
-            <label class="control control-checkbox">
-                remember me
-                <input class="remember-me-check" type="checkbox" checked="unchecked" />
-                <div class="control_indicator"></div>
-            </label>
-            <button class="main-menu-button signup-button">signup</button>
-            <button class="main-menu-button login-button">login</button>
+
+            <form class="signup-login">
+                <label for="email">email:</label>
+                <input class="main-menu-input email-input" type="email" name="email">
+                <label for="password">password:</label>
+                <input class="main-menu-input password-input" type="password" name="password">
+                <label class="control control-checkbox">
+                    remember me
+                        <input class="remember-me-check" type="checkbox" checked="unchecked" />
+                    <div class="control_indicator"></div>
+                </label>
+                <button class="main-menu-button signup-button">signup</button>
+                <button class="main-menu-button login-button">login</button>
+            </form>
+
+        </div>
+
+        <div class="main-menu logged-in-menu">
+
+            <button class="logout main-menu-button">logout</button>
 
         </div>
 
