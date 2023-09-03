@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3d Chess</title>
+</head>
+<body>
+
+    <style>
+
+        /* remember password css */
+        .control {
+            font-family: arial;
+            display: block;
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 5px;
+            padding-top: 3px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+            .control input {
+                position: absolute;
+                z-index: -1;
+                opacity: 0;
+            }
+        .control_indicator {
+            position: absolute;
+            top: 2px;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background: #e6e6e6;
+            border: 0px solid #000000;
+            border-radius: 0px;
+            margin-bottom: 10px;
+        }
+        .control:hover input ~ .control_indicator,
+        .control input:focus ~ .control_indicator {
+            background: #cccccc;
+        }
+        
+        .control input:checked ~ .control_indicator {
+            background: #2aa1c0;
+        }
+        .control:hover input:not([disabled]):checked ~ .control_indicator,
+        .control input:checked:focus ~ .control_indicator {
+            background: #0e6647;
+        }
+        .control input:disabled ~ .control_indicator {
+            background: #e6e6e6;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .control_indicator:after {
+            box-sizing: unset;
+            content: '';
+            position: absolute;
+            display: none;
+        }
+        .control input:checked ~ .control_indicator:after {
+            display: block;
+        }
+        .control-checkbox .control_indicator:after {
+            left: 8px;
+            top: 4px;
+            width: 3px;
+            height: 8px;
+            border: solid #ffffff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .control-checkbox input:disabled ~ .control_indicator:after {
+            border-color: #7b7b7b;
+        }
+        .control-checkbox .control_indicator::before {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4.5rem;
+            height: 4.5rem;
+            margin-left: -1.3rem;
+            margin-top: -1.3rem;
+            background: #2aa1c0;
+            border-radius: 3rem;
+            opacity: 0.6;
+            z-index: 99999;
+            transform: scale(0);
+        }
+        @keyframes s-ripple {
+            0% {
+                transform: scale(0);
+            }
+            20% {
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+        }
+        @keyframes s-ripple-dup {
+           0% {
+               transform: scale(0);
+            }
+           30% {
+                transform: scale(1);
+            }
+            60% {
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+        }
+        .control-checkbox input + .control_indicator::before {
+            animation: s-ripple 250ms ease-out;
+        }
+        .control-checkbox input:checked + .control_indicator::before {
+            animation-name: s-ripple-dup;
+        }
+
+        .signup-login {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav {
+            margin: 0px auto 0;
+            margin-bottom: 2vw;
+            position: relative;
+            top: 3%;
+            width: 76%;
+            left: 11.2%;
+            height: 5vw;
+            background-color: #570000;
+            border-radius: .8vw;
+            font-size: 0;
+        }
+        .nav .a {
+            line-height: 5vw;
+            height: 100%;
+            font-size: 1vw;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+            text-decoration: none;
+            text-transform: uppercase;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            width: calc( 100% / 6 );
+        }
+        nav .animation {
+            position: absolute;
+            height: 100%;
+            top: 0;
+            z-index: 0;
+            transition: all .6s ease 0s;
+            border-radius: .8vw;
+        }
+        .nav .start-home_link, a:nth-child(1):hover~.animation {
+            width: calc( 100% / 6 );
+            left: 0%;
+            background-color: #c7d3ff;
+        }
+        .nav .start-python_projects_link, a:nth-child(2):hover~.animation {
+            width: calc( 100% / 6 );
+            left: calc( 100% / 6 );
+            background-color: #0670ae;
+        }
+        .nav .start-java_projects_link, a:nth-child(3):hover~.animation {
+            width: calc( 100% / 6 );
+            left: calc( (100% / 6) * 2 );
+            background-color: #ef4811;
+        }
+        .nav .start-threejs_projects_link, a:nth-child(4):hover~.animation {
+            width: calc( 100% / 6 );
+            left: calc( (100% / 6) * 3 );
+            background-color: #000155;
+        }
+        .nav .start-blender_models_link, a:nth-child(5):hover~.animation {
+            width: calc( 100% / 6 );
+            left: calc( (100% / 6) * 4 );
+            background-color: #e79522;
+        }
+        .nav .start-blender_models_link, a:nth-child(6):hover~.animation {
+            width: calc( 100% / 6 );
+            left: calc( (100% / 6) * 5 );
+            background-color: #ca6565;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #d6c5bf, #ff0707b7, #583838, #8f5b5b);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            height: 100vh;
+        }  
+        @keyframes gradient {
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
+        }
+
+        .signup-login {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .main-menu-button {
+            box-shadow:inset 0px 1px 0px 0px #fbdcdc;
+            background:linear-gradient(to bottom, #fabdbd 5%, #ea8080 100%);
+            background-color:#fabdbd;
+            border-radius:6px;
+            border:1px solid #f38484;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            font-weight:bold;
+            padding:7px 32px;
+            text-decoration:none;
+            text-shadow:0px 1px 0px #cc5252;
+            margin-top: 10px;
+        }
+        .main-menu-button:hover {
+            background:linear-gradient(to bottom, #ea8080 5%, #fabdbd 100%);
+            background-color:#ea8080;
+        }
+
+        .select {
+            position: relative;
+            display: flex;
+            margin-top: 10px;
+        }    .select select {
+                font-family: Arial;
+                font-size:15px;
+                font-weight:bold;
+                text-align: left;
+                text-decoration:none;
+                text-shadow:0px 1px 0px #cc5252;
+                display: flex;
+                width: 100%;
+                cursor: pointer;
+                padding: 7px 40px;
+                outline: 0;
+                border: 1px solid #f38484;
+                border-radius: 6px;
+                background:linear-gradient(to bottom, #fabdbd 5%, #ea8080 100%);
+                background-color:#fabdbd;
+                color: #ffffff;
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+            }
+                .select select::-ms-expand {
+                    display: none;
+                    text-align: left;
+                }
+                .select select:hover,
+                .select select:focus {
+                    color: #ffffff;
+                    background:linear-gradient(to bottom, #ea8080 5%, #fabdbd 100%);
+                    background-color:#ea8080;
+                }
+                .select select:disabled {
+                    opacity: 0.5;
+                    pointer-events: none;
+                }
+        .select_arrow {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            pointer-events: none;
+            border-style: solid;
+            border-width: 8px 5px 0px 5px;
+            border-color: #ffffff transparent transparent transparent;
+        }
+        .select select:hover ~ .select_arrow,
+        .select select:focus ~ .select_arrow {
+            border-top-color: #ffffff;
+        }
+        .select select:disabled ~ .select_arrow {
+            border-top-color: #ffffff;
+        }
+        
+        /* Additional styles as needed */
+        
+
+        /*
+        .main-menu-button {
+            box-shadow:inset 0px 1px 0px 0px #f1dcfb;
+            background:linear-gradient(to bottom, #debdfa 5%, #a280ea 100%);
+            background-color:#dcbdfa;
+            border-radius:6px;
+            border:1px solid #bd84f3;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            font-weight:bold;
+            padding:7px 32px;
+            text-decoration:none;
+            text-shadow:0px 1px 0px #a152cc;
+            margin-top: 10px;
+        }
+        .main-menu-button:hover {
+            background:linear-gradient(to bottom, #be80ea 5%, #d8bdfa 100%);
+        }
+        */
+
+        .main-menu-button:active {
+            position:relative;
+            top:1px;
+        }
+
+        .main-menu {
+            position: fixed;
+            top: 3%;
+            left: 3%;
+            width: 200px;
+            height: 85%;
+            /* From https://css.glass */
+
+            /*background: rgba(147, 154, 208, 0.57);*/
+            background: rgba(255, 255, 255, 0.57);
+            
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12.1px);
+            -webkit-backdrop-filter: blur(12.1px);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .main-menu-input { 
+            font-size:16px; 
+            border-style:inset; 
+            border-color:#a8a8a8; 
+            text-align:left; 
+            border-width:1px; 
+            border-radius:8px; 
+            box-shadow: 2px 4px 12px 0px rgba(0,0,0,.72); 
+            text-shadow:0px 0px 0px rgba(42,42,42,.75); 
+            font-weight:normal; font-family:sans-serif; 
+            padding:6px;  
+            margin-bottom: 10px;
+        }
+
+        .chat-messages {
+            height: 200px;
+            width: 100%;
+            overflow-y: hidden; /* hide scrollbar */
+            padding: 5px;
+            margin-bottom: 5px;
+            /* From https://css.glass */
+            background: rgba(144, 191, 249, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(13.1px);
+            -webkit-backdrop-filter: blur(13.1px);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .chat-messages:hover {
+            overflow-y: auto; /* show scrollbar on hover */
+        }
+        .chat {
+            width: 100%;
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+        }
+        .send-button-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        .chat input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .main-menu-input:focus { 
+            outline:none; 
+        } 
+
+        @import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
+
+        #coding-club-header {
+            
+        }
+        svg {
+            font-family: "Russo One", sans-serif;
+            width: 100%; height: 20%;
+        }
+        svg text {
+            animation: stroke 5s infinite alternate;
+            stroke-width: 2;
+            stroke: #b42828;
+            font-size: 1.8vw;
+        }
+        @keyframes stroke {
+            0%   {
+                fill: rgb(222, 139, 139); stroke: rgb(238, 155, 155);
+                stroke-dashoffset: 25%; stroke-dasharray: 0 50%; stroke-width: 2;
+            }
+            70%  {fill: rgb(246, 127, 127); stroke: rgb(222, 105, 105); }
+            80%  {fill: rgba(251, 79, 79, 0.929); stroke: rgb(231, 85, 85); stroke-width: 3; }
+            100% {
+                fill: rgb(255, 19, 19); stroke: rgb(255, 0, 0);
+                stroke-dashoffset: -25%; stroke-dasharray: 50% 0; stroke-width: 0;
+            }
+        }
+
+    </style>
+
+    <nav class = "nav">
+        <a href = "https://carterross.dev/" id = "home_link" class = "a">
+            Home Page
+        </a>
+        <a href = "https://carterross.dev/python_projects" id = "python_projects_link" class = "a">
+            Python Projects
+        </a>
+        <a href = "https://carterross.dev/java_projects" id = "java_projects_link" class = "a">
+            Java Projects
+        </a>
+        <a href = "https://carterross.dev/threejs_projects" id = "threejs_projects_link" class = "a">
+            Threejs Projects
+        </a>
+        <a href = "https://carterross.dev/blender_models" id = "blender_models_link" class = "a">
+            Blender
+        </a>
+        <a href = "https://carterross.dev/benet_coding_club" id = "blender_models_link" class = "a">
+            Coding Club
+        </a>
+        <div class="animation start-home"></div>
+    </nav>
+
+    <div class="boxes">
+
+        <div class="main-menu">
+
+            <div class="wrapper" id="coding-club-h1">
+                <svg>
+                    <text x="50%" y="50%" dy=".35em" text-anchor="middle">
+                        Benet Coding Club
+                    </text>
+                </svg>
+            </div>
+            <label for="email">email:</label>
+            <input class="main-menu-input email-input" type="email" name="email">
+            <label for="password">password:</label>
+            <input class="main-menu-input username-input" type="text" name="username">
+            <label class="control control-checkbox">
+                remember me
+                <input class="remember-me-check" type="checkbox" checked="unchecked" />
+                <div class="control_indicator"></div>
+            </label>
+            <button class="main-menu-button signup-button">signup</button>
+            <button class="main-menu-button login-button">login</button>
+
+        </div>
+
+    </div>
+
+    <script src="bundle.js"></script>
+</body>
+</html>
