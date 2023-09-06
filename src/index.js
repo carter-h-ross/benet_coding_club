@@ -1,29 +1,41 @@
-let submissionForm = {
-  'group-name': '',
-  'team-members': [],
-  'project-name': '',
-  'github-link': '',
-  'group-password': '',
-  'image-link': '',
-  'is-website': false,
+let projectSubmission = {
+  "name": '',
+  "contributers": [],
+  "githubLink": "",
+  "imagePath": "",
+  "websiteLink": "none",
 }
 
 const mainMenuDiv = document.querySelector(".logged-out");
 const loggedInMenuDiv = document.querySelector(".logged-in-menu");
+const submissionMenuDiv = document.querySelector(".submission-menu");
 
 function goToLoggedInMenu() {
   mainMenuDiv.style.display = 'none';
   loggedInMenuDiv.style.display = 'flex';
 }
 
+function goToSubmissionMenu() {
+  submissionMenuDiv.style.display = 'flex';
+  loggedInMenuDiv.style.display = 'none';
+}
+
 function goToMainMenu() {
+  submissionMenuDiv.style.display = 'none';
   mainMenuDiv.style.display = 'flex';
   loggedInMenuDiv.style.display = 'none';
+  console.log();
 }
 goToMainMenu();
 
+function convertTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'numeric' });
+}
+
 /* -------------------------------------------------- firebase section ---------------------------------------------------------- */
-let email, username;
+let email, username, projectAccessRef;
+let projectAccessList = [];
 
 const firebaseConfig = {
   apiKey: "AIzaSyAR0CP4-z-kYWlvY-iLaTbaCrfn8QGIyqY",
@@ -64,6 +76,7 @@ import {
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const dr = getDatabase();
 const auth = getAuth();
 let userId;
 
@@ -79,6 +92,7 @@ signupForm.addEventListener('submit', (e) => {
       signupForm.reset()
       userId = cred.user.uid;
       goToLoggedInMenu();
+      initChat();
     })
     .catch(err => {
       console.log(err.message)
@@ -104,6 +118,11 @@ logoutButton.addEventListener('click', () => {
     })
 })
 
+const submissionMenuButton = document.querySelector(".add");
+submissionMenuButton.addEventListener('click', () => {
+  goToSubmissionMenu();
+})
+
 function admin () {
   if (username == "admin") {
     return true;
@@ -115,7 +134,8 @@ const loginForm = document.querySelector('.signup-login')
 loginForm.addEventListener('submit', (e) => {
   e.preventDefault()
 
-  const email = loginForm.email.value
+  email = loginForm.email.value
+  username = email.split('@')[0];
   const password = loginForm.password.value
 
   if (rememberMe) {
@@ -131,6 +151,7 @@ loginForm.addEventListener('submit', (e) => {
       loginForm.reset()
       userId = cred.user.uid;
       goToLoggedInMenu();
+      initChat();
     })
     .catch(err => {
       console.log(err.message)
@@ -155,18 +176,18 @@ if (localStorage.getItem("savedEmail") != null && localStorage.getItem("savedPas
 }
 
 // ingame messaging
-async function sendChatMessage(message, username, gameID) {
-  const chatID = push(ref(dr, `${gameID}/chat`)).key;
+async function sendChatMessage(message, username) {
+  const chatID = push(ref(dr, `chat`)).key;
   const chatData = {
     message: message,
     timestamp: Date.now(),
     username: username,
   };
-  await set(ref(dr, `${gameID}/chat/${chatID}`), chatData);
+  await set(ref(dr, `chat/${chatID}`), chatData);
 }
 
 function listenForNewMessages(gameID, callback) {
-  const chatRef = ref(dr, `${gameID}/chat`);
+  const chatRef = ref(dr, `chat`);
   onValue(chatRef, (snapshot) => {
     const messages = snapshot.val();
     callback(messages);
@@ -181,7 +202,7 @@ function initChat() {
     for (const messageKey in messages) {
       const messageData = messages[messageKey];
       const messageElement = document.createElement("div");
-      messageElement.textContent = `${messageData.username}: ${messageData.message}`;
+      messageElement.innerHTML = `<span style="color: red"> <span style="font-size: 0.4em">(${convertTimestamp(messageData.timestamp)})</span> ${messageData.username}</span>: ${messageData.message}`;
       chatMessages.appendChild(messageElement);
     }
   });
@@ -192,7 +213,7 @@ function initChat() {
   sendButton.addEventListener("click", () => {
     const message = chatInput.value;
     if (message) {
-      sendChatMessage(message, username, getMatchRef());
+      sendChatMessage(message, username);
       chatInput.value = "";
     }
   });
@@ -200,4 +221,75 @@ function initChat() {
 
 //-------------------- firebase file storage -----------------------
 
-const storage = getStorage(app);
+const submitProjectButton = document.querySelector(".submit-project-button");
+submitProjectButton.addEventListener("click", () => {
+  console.log("submitting project...");
+  let projectName, githubLink, websiteLink = "none";
+  let teamMember1, teamMember2, teamMember3 = "admin";
+
+  const projectNameInput = document.getElementById("projectName").value;
+  if (projectNameInput != "") {
+    projectName = projectNameInput;
+  } else {
+    alert("project name must be enetered")
+    return;
+  }
+
+  const teamMember1Input = document.getElementById("teamMember1").value;
+  if (teamMember1Input != "") {
+    teamMember1 = teamMember1Input;
+  } else {
+    alert("team member 1 name must be enetered")
+    return;
+  }
+
+  const teamMember2Input = document.getElementById("teamMember2").value;
+  if (teamMember2Input != "") {
+    teamMember2 = teamMember2Input;
+  }
+
+  const teamMember3Input = document.getElementById("teamMember3").value;
+  if (teamMember3Input != "") {
+    teamMember3 = teamMember3Input;
+  }
+
+  const githubLinkInput = document.getElementById("githubLink").value;
+  if (githubLinkInput !== "") {
+    if (githubLinkInput.startsWith("https://github.com/")) {
+      githubLink = githubLinkInput;
+    } else {
+      alert("The GitHub link must start with 'https://github.com/'");
+      return;
+    }
+  } else {
+    alert("GitHub link must be entered");
+    return;
+  }
+
+  const websiteLinkInput = document.getElementById("websiteLink").value;
+  if (websiteLinkInput != "") {
+    websiteLink = websiteLinkInput;
+  }
+
+  for (let i = 0; i < 3; i++) {
+    let projectAccessRef;
+    if (i == 0) {
+      projectAccessRef = `/projectAccess/${teamMember1}`
+    } else if (i == 1) {
+      projectAccessRef = `/projectAccess/${teamMember2}`
+    } else {
+      projectAccessRef = `/projectAccess/${teamMember3}`
+    }
+    console.log(projectAccessRef);
+    get(ref(dr, projectAccessRef)).then(snapshot => {
+      let projectAccessList = snapshot.exists() ? snapshot.val() : [];
+      projectAccessList.push(projectName);
+      return set(ref(dr, projectAccessRef), projectAccessList);
+    }).catch(error => {
+      console.error("Error getting/setting data: ", error);
+    });
+  }  
+
+})
+
+const storage = getStorage();

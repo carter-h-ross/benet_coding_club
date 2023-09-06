@@ -202,6 +202,7 @@
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             height: 100vh;
+            overflow: hidden;
         }  
         @keyframes gradient {
             0% {
@@ -336,7 +337,7 @@
             top: 15%;
             width: 76%;
             left: 23%;
-            height: 80vh;
+            height: 80%;
 
             /* From https://css.glass */
             /*background: rgba(147, 154, 208, 0.57);*/
@@ -350,8 +351,8 @@
         .main-menu {
             position: fixed;
             top: 3%;
-            left: 3%;
-            width: 15.5vw;
+            left: 1.5%;
+            width: 17%;
             height: 85%;
             /* From https://css.glass */
 
@@ -384,13 +385,13 @@
         }
 
         .chat-messages {
-            height: 200px;
+            height: 100%;
             width: 100%;
             overflow-y: hidden; /* hide scrollbar */
             padding: 5px;
             margin-bottom: 5px;
             /* From https://css.glass */
-            background: rgba(144, 191, 249, 0.3);
+            background: rgb(200, 200, 200);
             border-radius: 16px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(13.1px);
@@ -414,17 +415,13 @@
         }
         .chat input {
             flex-grow: 1;
-            margin-right: 10px;
+            width: 80%;
         }
         .main-menu-input:focus { 
             outline:none; 
         } 
 
         @import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
-
-        #coding-club-header {
-            
-        }
         svg {
             font-family: "Russo One", sans-serif;
             width: 100%; height: 20%;
@@ -483,8 +480,33 @@
         .buttonClass:hover {
             background: rgba(208, 2, 27, 0.56)
         }
-                
 
+        .submission-menu .main-menu-input::placeholder {
+            font-size: 0.6em;
+        }
+
+        input[type=file]::file-selector-button {
+            box-shadow:inset 0px 1px 0px 0px #fbdcdc;
+            background:linear-gradient(to bottom, #fabdbd 5%, #ea8080 100%);
+            background-color:#fabdbd;
+            border-radius:6px;
+            border:1px solid #f38484;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            font-weight:bold;
+            padding:7px 32px;
+            text-decoration:none;
+            text-shadow:0px 1px 0px #cc5252;
+            margin-top: 10px;
+          }
+          
+          input[type=file]::file-selector-button:hover {
+            background:linear-gradient(to bottom, #ea8080 5%, #fabdbd 100%);
+            background-color:#ea8080;
+          }
     </style>
 
     <nav class = "nav">
@@ -513,7 +535,7 @@
 
         <div class="main-menu logged-out">
 
-            <div class="wrapper" id="coding-club-h1">
+            <div class="wrapper coding-club-h1">
                 <svg>
                     <text x="50%" y="50%" dy=".35em" text-anchor="middle">
                         Benet Coding Club
@@ -539,7 +561,41 @@
 
         <div class="main-menu logged-in-menu">
 
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat">
+                <input type="text" id="chatInput" class="main-menu-input" placeholder="Type your message" />
+            </div>
+            <div class="send-button-wrapper">
+                <button id="sendButton" class="main-menu-button">send</button>
+            </div>
+            <button class="add main-menu-button">add project</button>
+            <button class="edit main-menu-button">edit project</button>
             <button class="logout main-menu-button">logout</button>
+
+        </div>
+
+        <div class="main-menu submission-menu">
+
+            <div class="chat">
+                <input type="text" id="projectName" class="main-menu-input" placeholder="enter project name" />
+            </div>
+            <div class="chat">
+                <input type="text" id="teamMember1" class="main-menu-input" placeholder="your username (must be accurate to edit)" />
+            </div>
+            <div class="chat">
+                <input type="text" id="teamMember2" class="main-menu-input" placeholder="second person username (optional)" />
+            </div>
+            <div class="chat">
+                <input type="text" id="teamMember3" class="main-menu-input" placeholder="third person username (optional)" />
+            </div>
+            <div class="chat">
+                <input type="text" id="githubLink" class="main-menu-input" placeholder="github link to code" />
+            </div>
+            <div class="chat">
+                <input type="text" id="websiteLink" class="main-menu-input" placeholder="website link (if website)" />
+            </div>
+            <input type="file" id="imageUpload" title=" " style="color:transparent; font-size: 0px"/>
+            <button class="main-menu-button submit-project-button">submit project</button>
 
         </div>
 
